@@ -1,6 +1,5 @@
 <template>
   <div>
-     <v-select v-model="model" :items="devices" readonly label="Device"></v-select>
     <v-data-table
     :headers="headers"
     :items="requests"
@@ -27,19 +26,22 @@
               <v-container grid-list-md>
                 <v-layout wrap>
                   <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedItem.name" label="Name"></v-text-field>
+                    <v-text-field v-model="editedRequest.name" label="Name"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedItem.heading" label="Heading"></v-text-field>
+                    <v-text-field v-model="editedRequest.heading" label="Heading"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedItem.body" label="Body"></v-text-field>
+                    <v-text-field v-model="editedRequest.body" label="Body"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-select v-model="editedItem.device" :items="devices" readonly label="Device"></v-select>
+                    <v-select v-model="editedRequest.deviceId" :items="devices" filled label="Device"></v-select>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedItem.priority" label="Priority"></v-text-field>
+                    <v-text-field v-model="editedRequest.priority" label="Priority"></v-text-field>
+                  </v-flex>
+                  <v-flex v-if="editedRequest.id">
+                    <v-switch v-model="editedRequest.open" class="ma-2" label="Open"></v-switch>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -80,24 +82,28 @@ export default {
     ],
     model: null,
     devices: [
-      { text: 'State 1', value: 0 },
-      { text: 'State 2', value: 1 }
+      { text: 'Computer', value: 0 },
+      { text: 'Display', value: 1 }
     ],
     requests: [],
     editedIndex: -1,
-    editedItem: {
+    editedRequest: {
+      id: null,
       name: '',
       heading: '',
       body: '',
-      device: '',
-      priority: 0
+      priority: 0,
+      open: null,
+      deviceId: null
     },
-    defaultItem: {
+    defaultRequest: {
+      id: null,
       name: '',
       heading: '',
       body: '',
-      device: '',
-      priority: 0
+      priority: 0,
+      open: true,
+      deviceId: null
     }
   }),
 
@@ -120,46 +126,52 @@ export default {
     initialize () {
       this.requests = [
         {
+          id: 1,
           name: 'A',
           heading: 'A',
           body: 'A',
-          device: 'A',
-          priority: 0
+          priority: 0,
+          deviceId: 1,
+          open: true
         },
         {
+          id: 2,
           name: 'S',
           heading: 'S',
           body: 'S',
-          device: 'S',
-          priority: 0
+          priority: 0,
+          deviceId: 0,
+          open: false
         },
         {
+          id: 3,
           name: 'S',
           heading: 'S',
           body: 'S',
-          device: 'S',
-          priority: 0
+          priority: 0,
+          open: true,
+          deviceId: 0
         }
       ]
     },
     editItem (item) {
       this.editedIndex = this.requests.indexOf(item)
-      this.editedItem = Object.assign({}, item)
+      this.editedRequest = Object.assign({}, item)
       this.dialog = true
     },
     close () {
       this.dialog = false
       setTimeout(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
+        this.editedRequest = Object.assign({}, this.defaultRequest)
         this.editedIndex = -1
       }, 300)
     },
     save () {
       if (this.editedIndex > -1) {
-        Object.assign(this.requests[this.editedIndex], this.editedItem)
+        Object.assign(this.requests[this.editedIndex], this.editedRequest)
       } else {
-
-        // this.requests.push(this.editedItem)
+        let request = this.editedRequest
+        this.$store.dispatch('SAVE_REQUEST', { request })
       }
       this.close()
     }

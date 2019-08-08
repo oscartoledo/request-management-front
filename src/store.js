@@ -5,7 +5,7 @@ import axios from 'axios'
 Vue.use(Vuex)
 
 const restUrl = process.env.VUE_APP_API_REST_URL
-const requestServiceUrl = '/request'
+const requestServiceUrl = 'request'
 
 export default new Vuex.Store({
   state: {
@@ -13,12 +13,12 @@ export default new Vuex.Store({
   },
   actions: {
     SAVE_REQUEST: ({ commit, state }, { request }) => {
-      return axios.post(`${restUrl}/${requestServiceUrl}`)
+      return axios.post(`${restUrl}/${requestServiceUrl}`, request)
         .then(response => {
           commit('ADD_REQUEST', { request: response.data })
         })
         .catch(error => {
-          console.error(error)
+          console.error(error.response.status)
         })
     }
   },
