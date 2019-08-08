@@ -14,6 +14,16 @@ export default new Vuex.Store({
     devices: []
   },
   actions: {
+    GET_REQUESTS: ({ commit, state }) => {
+      return axios.get(`${restUrl}/${requestServiceUrl}`)
+        .then(response => {
+          commit('SET_REQUESTS', { devices: response.data })
+        })
+        .catch(error => {
+          console.error(error.response.status)
+        })
+    },
+
     SAVE_REQUEST: ({ commit, state }, { request }) => {
       return axios.post(`${restUrl}/${requestServiceUrl}`, request)
         .then(response => {
@@ -35,6 +45,10 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    SET_REQUESTS: (state, { devices }) => {
+      state.requests = devices
+    },
+
     ADD_REQUEST: (state, { request }) => {
       state.requests.push(request)
     },
@@ -44,7 +58,7 @@ export default new Vuex.Store({
     }
   },
   getters: {
-    requests: state => {
+    getRequests: state => {
       return state.requests
     },
 

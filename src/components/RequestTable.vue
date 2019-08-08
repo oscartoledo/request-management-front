@@ -41,7 +41,7 @@
                     <v-text-field v-model="editedRequest.priority" label="Priority"></v-text-field>
                   </v-flex>
                   <v-flex v-if="editedRequest.id">
-                    <v-switch v-model="editedRequest.open" class="ma-2" label="Open"></v-switch>
+                    <v-switch v-model="editedRequest.open" class="ma-2" label="Open" disabled></v-switch>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -50,7 +50,8 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-              <v-btn color="blue darken-1" text @click="save">Save</v-btn>
+              <v-btn v-if="!editedRequest.id" color="blue darken-1" text @click="save">Save</v-btn>
+              <v-btn v-if="editedRequest.id && editedRequest.open" color="blue darken-1" text @click="closeRequest">Close</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -82,7 +83,6 @@ export default {
       { text: 'Priority', value: 'priority' },
       { text: 'Actions', value: 'action', sortable: false }
     ],
-    requests: [],
     editedIndex: -1,
     editedRequest: {
       id: null,
@@ -116,7 +116,8 @@ export default {
     },
 
     ...mapGetters({
-      devices: 'getDevices'
+      devices: 'getDevices',
+      requests: 'getRequests'
     })
   },
 
@@ -131,43 +132,16 @@ export default {
 
   methods: {
     initialize () {
-      this.requests = [
-        {
-          id: 1,
-          name: 'A',
-          heading: 'A',
-          body: 'A',
-          priority: 0,
-          deviceId: 1,
-          open: true
-        },
-        {
-          id: 2,
-          name: 'S',
-          heading: 'S',
-          body: 'S',
-          priority: 0,
-          deviceId: 0,
-          open: false
-        },
-        {
-          id: 3,
-          name: 'S',
-          heading: 'S',
-          body: 'S',
-          priority: 0,
-          open: true,
-          deviceId: 0
-        }
-      ]
-
       this.$store.dispatch('GET_DEVICES')
+      this.$store.dispatch('GET_REQUESTS')
     },
+
     editItem (item) {
       this.editedIndex = this.requests.indexOf(item)
       this.editedRequest = Object.assign({}, item)
       this.dialog = true
     },
+
     close () {
       this.dialog = false
       setTimeout(() => {
@@ -175,14 +149,17 @@ export default {
         this.editedIndex = -1
       }, 300)
     },
+
     save () {
-      if (this.editedIndex > -1) {
-        Object.assign(this.requests[this.editedIndex], this.editedRequest)
-      } else {
+      if (this.editedIndex < 0) {
         let request = this.editedRequest
         this.$store.dispatch('SAVE_REQUEST', { request })
       }
       this.close()
+    },
+
+    closeRequest () {
+
     }
   }
 }
