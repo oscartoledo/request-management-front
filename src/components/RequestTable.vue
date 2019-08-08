@@ -35,7 +35,7 @@
                     <v-text-field v-model="editedRequest.body" label="Body"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-select v-model="editedRequest.deviceId" :items="devices" filled label="Device"></v-select>
+                    <v-select v-model="editedRequest.deviceId" :items="deviceItems" filled label="Device"></v-select>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
                     <v-text-field v-model="editedRequest.priority" label="Priority"></v-text-field>
@@ -70,6 +70,8 @@
   </div>
 </template>
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   data: () => ({
     dialog: false,
@@ -79,11 +81,6 @@ export default {
       { text: 'Device', value: 'device', sortable: false },
       { text: 'Priority', value: 'priority' },
       { text: 'Actions', value: 'action', sortable: false }
-    ],
-    model: null,
-    devices: [
-      { text: 'Computer', value: 0 },
-      { text: 'Display', value: 1 }
     ],
     requests: [],
     editedIndex: -1,
@@ -110,7 +107,17 @@ export default {
   computed: {
     formTitle () {
       return this.editedIndex === -1 ? 'New Request' : 'Edit Request'
-    }
+    },
+
+    deviceItems () {
+      return this.devices.map(device => {
+        return { value: device.id, text: device.name }
+      })
+    },
+
+    ...mapGetters({
+      devices: 'getDevices'
+    })
   },
 
   watch: {
@@ -153,6 +160,8 @@ export default {
           deviceId: 0
         }
       ]
+
+      this.$store.dispatch('GET_DEVICES')
     },
     editItem (item) {
       this.editedIndex = this.requests.indexOf(item)

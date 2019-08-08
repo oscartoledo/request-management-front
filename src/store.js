@@ -6,10 +6,12 @@ Vue.use(Vuex)
 
 const restUrl = process.env.VUE_APP_API_REST_URL
 const requestServiceUrl = 'request'
+const deviceServiceUrl = 'device'
 
 export default new Vuex.Store({
   state: {
-    requests: []
+    requests: [],
+    devices: []
   },
   actions: {
     SAVE_REQUEST: ({ commit, state }, { request }) => {
@@ -20,16 +22,34 @@ export default new Vuex.Store({
         .catch(error => {
           console.error(error.response.status)
         })
+    },
+
+    GET_DEVICES: ({ commit, state }) => {
+      return axios.get(`${restUrl}/${deviceServiceUrl}`)
+        .then(response => {
+          commit('SET_DEVICES', { devices: response.data })
+        })
+        .catch(error => {
+          console.error(error.response.status)
+        })
     }
   },
   mutations: {
     ADD_REQUEST: (state, { request }) => {
       state.requests.push(request)
+    },
+
+    SET_DEVICES: (state, { devices }) => {
+      state.devices = devices
     }
   },
   getters: {
-    request: state => {
+    requests: state => {
       return state.requests
+    },
+
+    getDevices: state => {
+      return state.devices
     }
   }
 })
