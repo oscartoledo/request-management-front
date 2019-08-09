@@ -18,6 +18,8 @@ export default new Vuex.Store({
       return axios.get(`${restUrl}/${requestServiceUrl}`)
         .then(response => {
           commit('SET_REQUESTS', { devices: response.data })
+
+          return response.data
         })
         .catch(error => {
           console.error(error.response.status)
@@ -28,6 +30,20 @@ export default new Vuex.Store({
       return axios.post(`${restUrl}/${requestServiceUrl}`, request)
         .then(response => {
           commit('ADD_REQUEST', { request: response.data })
+
+          return response.data
+        })
+        .catch(error => {
+          console.error(error.response.status)
+        })
+    },
+
+    ClOSE_REQUEST: ({ commit, state }, { request, index }) => {
+      return axios.put(`${restUrl}/${requestServiceUrl}/${request.id}/close`)
+        .then(response => {
+          commit('UPDATE_REQUEST', { request: response.data, index: index })
+
+          return response.data
         })
         .catch(error => {
           console.error(error.response.status)
@@ -51,6 +67,10 @@ export default new Vuex.Store({
 
     ADD_REQUEST: (state, { request }) => {
       state.requests.push(request)
+    },
+
+    UPDATE_REQUEST: (state, { request, index }) => {
+      Object.assign(state.requests[index], request)
     },
 
     SET_DEVICES: (state, { devices }) => {

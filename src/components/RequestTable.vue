@@ -26,19 +26,19 @@
               <v-container grid-list-md>
                 <v-layout wrap>
                   <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedRequest.name" label="Name"></v-text-field>
+                    <v-text-field v-model="editedRequest.name" label="Name" required></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedRequest.heading" label="Heading"></v-text-field>
+                    <v-text-field v-model="editedRequest.heading" label="Heading" required></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedRequest.body" label="Body"></v-text-field>
+                    <v-text-field v-model="editedRequest.body" label="Body" required></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-select v-model="editedRequest.deviceId" :items="deviceItems" filled label="Device"></v-select>
+                    <v-select v-model="editedRequest.deviceId" :items="deviceItems" filled label="Device" required></v-select>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedRequest.priority" label="Priority"></v-text-field>
+                    <v-text-field v-model="editedRequest.priority" label="Priority" required></v-text-field>
                   </v-flex>
                   <v-flex v-if="editedRequest.id">
                     <v-switch v-model="editedRequest.open" class="ma-2" label="Open" disabled></v-switch>
@@ -61,7 +61,7 @@
       <v-icon small
         class="mr-2"
         @click="editItem(item)" >
-        edit
+        view
       </v-icon>
     </template>
     <template v-slot:no-data>
@@ -90,7 +90,7 @@ export default {
       heading: '',
       body: '',
       priority: 0,
-      open: null,
+      open: true,
       deviceId: null
     },
     defaultRequest: {
@@ -152,14 +152,18 @@ export default {
 
     save () {
       if (this.editedIndex < 0) {
-        let request = this.editedRequest
-        this.$store.dispatch('SAVE_REQUEST', { request })
+        this.$store.dispatch('SAVE_REQUEST', { request: this.editedRequest })
+        this.close()
       }
-      this.close()
     },
 
     closeRequest () {
-
+      if (this.editedIndex > 0) {
+        this.$store.dispatch('ClOSE_REQUEST', { request: this.editedRequest, index: this.editedIndex })
+          .then(request => {
+            this.editedRequest.open = request.open
+          })
+      }
     }
   }
 }
