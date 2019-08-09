@@ -10,13 +10,23 @@
     </v-app-bar>
 
     <v-content>
+      <v-layout wrap>
+        <v-flex xs12>
+          <v-alert v-if="system.error.show" type="error">{{ system.error.message }}</v-alert>
+        </v-flex>
+      </v-layout>
+
       <RequestTable/>
+
     </v-content>
+
   </v-app>
 </template>
 
 <script>
 import RequestTable from './components/RequestTable'
+
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'App',
@@ -24,7 +34,11 @@ export default {
     RequestTable
   },
   data: () => ({
-    //
-  })
+  }),
+  computed: {
+    ...mapGetters({
+      system: 'getSystem'
+    })
+  }
 }
 </script>

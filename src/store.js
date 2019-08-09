@@ -11,7 +11,13 @@ const deviceServiceUrl = 'device'
 export default new Vuex.Store({
   state: {
     requests: [],
-    devices: []
+    devices: [],
+    system: {
+      error: {
+        message: '',
+        show: false
+      }
+    }
   },
   actions: {
     GET_REQUESTS: ({ commit, state }) => {
@@ -22,7 +28,8 @@ export default new Vuex.Store({
           return response.data
         })
         .catch(error => {
-          console.error(error.response.status)
+          let message = error.response.data.message
+          commit('SHOW_ERROR', { message })
         })
     },
 
@@ -34,7 +41,8 @@ export default new Vuex.Store({
           return response.data
         })
         .catch(error => {
-          console.error(error.response.status)
+          let message = error.response.data.message
+          commit('SHOW_ERROR', { message })
         })
     },
 
@@ -46,7 +54,8 @@ export default new Vuex.Store({
           return response.data
         })
         .catch(error => {
-          console.error(error.response.status)
+          let message = error.response.data.message
+          commit('SHOW_ERROR', { message })
         })
     },
 
@@ -56,7 +65,8 @@ export default new Vuex.Store({
           commit('SET_DEVICES', { devices: response.data })
         })
         .catch(error => {
-          console.error(error.response.status)
+          let message = error.response.data.message
+          commit('SHOW_ERROR', { message })
         })
     }
   },
@@ -75,6 +85,16 @@ export default new Vuex.Store({
 
     SET_DEVICES: (state, { devices }) => {
       state.devices = devices
+    },
+
+    SHOW_ERROR: (state, { message }) => {
+      state.system.error.show = true
+      state.system.error.message = message
+
+      setTimeout(() => {
+        state.system.error.show = false
+        state.system.error.message = ''
+      }, 5000)
     }
   },
   getters: {
@@ -84,6 +104,10 @@ export default new Vuex.Store({
 
     getDevices: state => {
       return state.devices
+    },
+
+    getSystem: state => {
+      return state.system
     }
   }
 })
