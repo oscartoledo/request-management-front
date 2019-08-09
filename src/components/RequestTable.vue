@@ -24,33 +24,40 @@
 
             <v-card-text>
               <v-container grid-list-md>
-                <v-layout wrap>
-                  <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedRequest.name" label="Name" required></v-text-field>
-                  </v-flex>
-                  <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedRequest.heading" label="Heading" required></v-text-field>
-                  </v-flex>
-                  <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedRequest.body" label="Body" required></v-text-field>
-                  </v-flex>
-                  <v-flex xs12 sm6 md4>
-                    <v-select v-model="editedRequest.deviceId" :items="deviceItems" filled label="Device" required></v-select>
-                  </v-flex>
-                  <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedRequest.priority" label="Priority" required></v-text-field>
-                  </v-flex>
-                  <v-flex v-if="editedRequest.id">
-                    <v-switch v-model="editedRequest.open" class="ma-2" label="Open" disabled></v-switch>
-                  </v-flex>
-                </v-layout>
+                <v-form ref="form" v-model="validations.status" :lazy-validation="validations.lazy" >
+                  <v-layout wrap>
+                    <v-flex xs12 sm6 md4>
+                      <v-text-field v-model="editedRequest.name" label="Name"
+                        :rules="validations.textRules" required></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm6 md4>
+                      <v-text-field v-model="editedRequest.heading" label="Heading"
+                        :rules="validations.textRules" required></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm6 md4>
+                      <v-text-field v-model="editedRequest.body" label="Body"
+                        :rules="validations.textRules" required></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm6 md4>
+                      <v-select v-model="editedRequest.deviceId" :items="deviceItems" label="Device"
+                        :rules="validations.deviceIdRules" required filled></v-select>
+                    </v-flex>
+                    <v-flex xs12 sm6 md4>
+                      <v-text-field v-model="editedRequest.priority" label="Priority"
+                      :rules="validations.priorityRules" required></v-text-field>
+                    </v-flex>
+                    <v-flex v-if="editedRequest.id">
+                      <v-switch v-model="editedRequest.open" class="ma-2" label="Open" readonly></v-switch>
+                    </v-flex>
+                  </v-layout>
+                </v-form>
               </v-container>
             </v-card-text>
 
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-              <v-btn v-if="!editedRequest.id" color="blue darken-1" text @click="save">Save</v-btn>
+              <v-btn v-if="!editedRequest.id" color="blue darken-1" text @click="save" :disabled="!validations.status">Save</v-btn>
               <v-btn v-if="editedRequest.id && editedRequest.open" color="blue darken-1" text @click="closeRequest">Close</v-btn>
             </v-card-actions>
           </v-card>
@@ -89,7 +96,7 @@ export default {
       name: '',
       heading: '',
       body: '',
-      priority: 0,
+      priority: null,
       open: true,
       deviceId: null
     },
@@ -98,9 +105,24 @@ export default {
       name: '',
       heading: '',
       body: '',
-      priority: 0,
+      priority: null,
       open: true,
       deviceId: null
+    },
+    validations: {
+      status: true,
+      lazy: false,
+      textRules: [
+        v => !!v || 'This field is required',
+        v => (v && v.length >= 5) || 'This field must be more than 5 characters'
+      ],
+      deviceIdRules: [
+        v => !!v || 'You must select a Device to create a Request'
+      ],
+      priorityRules: [
+        v => !!v || 'Priority is required',
+        v => (v && v >= 1) || 'Priority must be a value equal or over than 1'
+      ]
     }
   }),
 
@@ -123,6 +145,7 @@ export default {
 
   watch: {
     dialog (val) {
+      this.resetValidation()
       val || this.close()
     }
   },
@@ -140,6 +163,10 @@ export default {
       this.editedIndex = this.requests.indexOf(item)
       this.editedRequest = Object.assign({}, item)
       this.dialog = true
+    },
+
+    resetValidation () {
+      this.$refs.form.resetValidation()
     },
 
     close () {
