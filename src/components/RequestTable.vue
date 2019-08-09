@@ -26,29 +26,32 @@
               <v-container grid-list-md>
                 <v-form ref="form" v-model="validations.status" :lazy-validation="validations.lazy" >
                   <v-layout wrap>
-                    <v-flex xs12 sm6 md4>
+                    <v-flex xs12 sm6 md6>
                       <v-text-field v-model="editedRequest.name" label="Name"
                         :rules="validations.textRules" required></v-text-field>
                     </v-flex>
-                    <v-flex xs12 sm6 md4>
+                    <v-flex xs12 sm6 md6>
                       <v-text-field v-model="editedRequest.heading" label="Heading"
                         :rules="validations.textRules" required></v-text-field>
                     </v-flex>
-                    <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedRequest.body" label="Body"
-                        :rules="validations.textRules" required></v-text-field>
-                    </v-flex>
-                    <v-flex xs12 sm6 md4>
+                    <v-flex xs12 sm6 md6>
                       <v-select v-model="editedRequest.deviceId" :items="deviceItems" label="Device"
                         :rules="validations.deviceIdRules" required filled></v-select>
                     </v-flex>
-                    <v-flex xs12 sm6 md4>
+                    <v-flex xs12 sm6 md6>
                       <v-text-field v-model="editedRequest.priority" label="Priority"
                         type="number" min="1" step="1"
                         :rules="validations.priorityRules" required></v-text-field>
                     </v-flex>
-                    <v-flex v-if="editedRequest.id">
+                    <v-flex xs12 sm6 md6 v-if="editedRequest.id">
                       <v-switch v-model="editedRequest.open" class="ma-2" label="Open" readonly></v-switch>
+                    </v-flex>
+                    <v-flex xs12 sm6 md6 v-if="editedRequest.id && editedRequest.open">
+                      <v-btn color="secondary text-center" text @click="closeRequest" outlined >Close Request</v-btn>
+                    </v-flex>
+                    <v-flex xs12 sm12 md12>
+                      <v-textarea v-model="editedRequest.body" label="Body"
+                        :rules="validations.textRules" required></v-textarea>
                     </v-flex>
                   </v-layout>
                 </v-form>
@@ -59,7 +62,6 @@
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
               <v-btn v-if="!editedRequest.id" color="blue darken-1" text @click="save" :disabled="!validations.status">Save</v-btn>
-              <v-btn v-if="editedRequest.id && editedRequest.open" color="blue darken-1" text @click="closeRequest">Close</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -186,7 +188,7 @@ export default {
     },
 
     closeRequest () {
-      if (this.editedIndex > 0) {
+      if (this.editedIndex > -1) {
         this.$store.dispatch('ClOSE_REQUEST', { request: this.editedRequest, index: this.editedIndex })
           .then(request => {
             this.editedRequest.open = request.open
