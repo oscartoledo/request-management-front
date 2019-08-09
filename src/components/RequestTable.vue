@@ -44,7 +44,8 @@
                     </v-flex>
                     <v-flex xs12 sm6 md4>
                       <v-text-field v-model="editedRequest.priority" label="Priority"
-                      :rules="validations.priorityRules" required></v-text-field>
+                        type="number" min="1" step="1"
+                        :rules="validations.priorityRules" required></v-text-field>
                     </v-flex>
                     <v-flex v-if="editedRequest.id">
                       <v-switch v-model="editedRequest.open" class="ma-2" label="Open" readonly></v-switch>
