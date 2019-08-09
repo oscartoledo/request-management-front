@@ -3,7 +3,9 @@
     <v-data-table
     :headers="headers"
     :items="requests"
-    sort-by="calories"
+    disable-pagination
+    hide-default-footer
+    sort-by="name"
     class="elevation-1">
     <template v-slot:top>
       <v-toolbar flat color="white">
@@ -169,7 +171,11 @@ export default {
     },
 
     resetValidation () {
-      this.$refs.form.resetValidation()
+      let form = this.$refs.form
+
+      if (form) {
+        form.resetValidation()
+      }
     },
 
     close () {
