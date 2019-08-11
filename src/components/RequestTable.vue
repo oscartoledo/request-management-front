@@ -2,7 +2,7 @@
   <div>
     <v-data-table
     :headers="headers"
-    :items="requests"
+    :items="requestItems"
     disable-pagination
     hide-default-footer
     sort-by="name"
@@ -91,7 +91,7 @@ export default {
     headers: [
       { text: 'Name', value: 'name' },
       { text: 'Heading', value: 'heading', sortable: false },
-      { text: 'Device', value: 'device', sortable: false },
+      { text: 'Device', value: 'deviceName', sortable: false },
       { text: 'Priority', value: 'priority' },
       { text: 'Actions', value: 'action', sortable: false }
     ],
@@ -133,12 +133,27 @@ export default {
 
   computed: {
     formTitle () {
-      return this.editedIndex === -1 ? 'New Request' : 'Edit Request'
+      return this.editedIndex === -1 ? 'New Request' : 'Close Request'
     },
 
     deviceItems () {
       return this.devices.map(device => {
         return { value: device.id, text: device.name }
+      })
+    },
+
+    requestItems () {
+      return this.requests.map(request => {
+        let device = this.devices.find(device => {
+          return device.id === request.deviceId
+        })
+
+        return {
+          name: request.name,
+          heading: request.heading,
+          deviceName: device.name,
+          priority: request.priority
+        }
       })
     },
 
